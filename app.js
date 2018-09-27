@@ -1,26 +1,36 @@
-/*
-    Module dependencies
-*/
-const restify = require('restify');
-const logger = require('morgan');
+/**
+ * Module dependencies
+ */ 
+const express = require('express');
+const logger = require("morgan");
+const expressValidator = require('express-validator');
+// const MongoStore = require('connect-mongo')
 
-/*
-    Restify configuration
-*/
-const server = restify.createServer();
+// route handlers
+const homeHandler = require('./handlers/home');
+const postLoginHandler = require('./handlers/user');
 
-restify.plugins.queryParser()
+// create web server
+app = express()
 
-server.use(logger('dev'));
-server.get('/hello/:name',(req,res) => {
-   res.send(`Hello ${res.params.name}!`) 
-})
+// middlewares
+app.use(logger('dev'));
+app.use(expressValidator())
+app.use(flash())
 
-/*
-    Run the server
-*/
-port = 8000;
-server.listen(port, 'localhost', () => {
-    console.log(`listening at ${port}`);
+// primary app routes
+app.get("/", homeHandler.index);
+app.post('/login', postLoginHandler.postLogin);
+
+// error handler
+app.use( (err, req, res, next) => {
+    console.log(err)
+    res.status(500).send('Server Error');
 });
+
+// start app
+port = 8080
+app.listen(port,"localhost",()=>{
+    console.log(`listening at localhost:${port}`)
+})
 
