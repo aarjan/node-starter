@@ -3,7 +3,8 @@
  */ 
 const express = require('express');
 const logger = require("morgan");
-const expressValidator = require('express-validator');
+const {check} = require('express-validator/check');
+const bodyParser = require('body-parser')
 // const MongoStore = require('connect-mongo')
 
 // route handlers
@@ -15,12 +16,14 @@ app = express()
 
 // middlewares
 app.use(logger('dev'));
-app.use(expressValidator())
-app.use(flash())
+app.use(bodyParser.json());
 
 // primary app routes
 app.get("/", homeHandler.index);
-app.post('/login', postLoginHandler.postLogin);
+app.post('/login', [
+            check('email').isEmail(), 
+            check('password').isLength({min:5})
+        ], postLoginHandler.postLogin);
 
 // error handler
 app.use( (err, req, res, next) => {
